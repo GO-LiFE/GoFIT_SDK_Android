@@ -24,6 +24,6 @@ Coming soon~
 Coming soon~
 
 ## Copyright and License
-無疑地此為 `Community Edition`.
+此為 `Community Edition`.
 
 智慧財產權為 [GOLiFE](http://www.goyourlife.com) 所有. &copy; 2018 GOYOURLIFE INC. 
