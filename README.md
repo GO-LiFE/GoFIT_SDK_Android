@@ -1,6 +1,6 @@
 # GoFIT SDK for Android — [GOLiFE 手環](http://www.goyourlife.com/zh-TW/productlist/#health) App 介接 SDK
 
-此為 [GOLiFE](http://www.goyourlife.com) 釋出之官方 (Android) App SDK (`Community Edition`).
+此為 [GOLiFE](http://www.goyourlife.com) 釋出之官方 Android App SDK (`Community Edition`).
 
 Android App 的開發人員，可藉由本 SDK 的整合，即可輕輕鬆鬆快速完成開發，並可直接與市面上 [GOLiFE](http://www.goyourlife.com) 出品銷售之 GOLiFE [Care 系列手環](http://www.goyourlife.com/zh-TW/productlist/#health) 裝置連接，達成包括連線、配對、同步、設定等等各項功能。
 
