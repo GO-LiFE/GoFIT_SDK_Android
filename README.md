@@ -26,9 +26,6 @@
 
 商業用途或是客製合作，都非常歡迎您來信 [聯繫我們](http://www.goyourlife.com/zh-TW/feedback/)
 
-## Demo App
-Coming soon~
-
 ## API SPEC
 Coming soon~
 
