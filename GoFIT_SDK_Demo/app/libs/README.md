@@ -1,0 +1,1 @@
+請下載 GoFIT_SDK-release.aar 並將之放在此目錄內。

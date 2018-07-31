@@ -1,0 +1,61 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    android:title="GoFIT Demo"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
+
+    <PreferenceCategory android:title="SDK" >
+        <Preference
+            android:key="sdk_init_reinit"
+            android:title=" " />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="BLE FUNCTION" >
+        <Preference
+            android:key="demo_function_scan"
+            android:title="1. Scan Device" />
+        <Preference
+            android:key="demo_function_new_pairing"
+            android:title="2. New Paring" />
+        <Preference
+            android:key="demo_function_connect"
+            android:title="3. Connect" />
+        <Preference
+            android:key="demo_function_setting"
+            android:title="4. Device Setting" />
+        <Preference
+            android:key="demo_function_sync"
+            android:title="5. Get Fitness Data" />
+        <Preference
+            android:key="demo_function_clear"
+            android:title="6. Clear Data" />
+        <Preference
+            android:key="demo_function_init"
+            android:title="7. Device Data Initialization" />
+        <Preference
+            android:key="demo_function_dfu"
+            android:title="8. Device Firmware Update" />
+        <Preference
+            android:key="demo_function_disconnect"
+            android:title="9. Device Disconnect" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="DEVICE STATUS" >
+        <Preference
+            android:key="demo_connect_status"
+            android:title="Connect Status" />
+        <Preference
+            android:key="demo_battery"
+            android:title="Battery" />
+        <Preference
+            android:key="demo_mac"
+            android:title="MAC Address" />
+        <Preference
+            android:key="demo_sn"
+            android:title="SN" />
+        <Preference
+            android:key="demo_fw_version"
+            android:title="FW Version" />
+    </PreferenceCategory>
+
+</PreferenceScreen>
