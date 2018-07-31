@@ -5,7 +5,7 @@
 讓任何人都可以藉由本 SDK，直接拿 [GOLiFE](http://www.goyourlife.com) 市售手環就可以連接、取資料。
 
 
-## What's This?
+## What is it?
 - Android App 的開發人員，可藉由本 SDK 的整合，便可輕輕鬆鬆、快速完成開發。
 
 - 並且，即刻就可直接與市面上 [GOLiFE](http://www.goyourlife.com) 出品銷售之 GOLiFE [Care 系列手環](http://www.goyourlife.com/zh-TW/productlist/#health) 裝置連接。達成包括連線、配對、同步、設定等等各項功能。
