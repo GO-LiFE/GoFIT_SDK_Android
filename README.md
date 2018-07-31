@@ -15,8 +15,8 @@
 
 ## Installation / 怎麼用?
 1. 下載本 SDK
-2. 請到 [本網址](http://www.goyourlife.com/zh-TW/feedback/) 申請試用憑證
-    - 請不用擔心，僅是請您留個聯絡方式，只要填寫 email 或電話大名等等，填寫您希望使用的裝置即可。我們收到後便馬上回覆 30 天的試用憑證給您~
+2. 請到 [GoFIT SDK 申請系統](https://docs.google.com/forms/d/1xRhfnWBJJc4iYitthu0SAjmc9HAEpkLSlIjHN0htdMs) 申請試用憑證
+    - (請不用擔心，僅是請您留個聯絡方式，只要填寫 email 或電話大名等等，填寫您希望使用的裝置即可。我們收到後便馬上回覆 30 天的試用憑證給您~)
 3. 將試用憑證如下整合
 
     ```
