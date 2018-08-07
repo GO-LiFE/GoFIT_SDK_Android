@@ -4,9 +4,13 @@
 
 此為 [GOLiFE](http://www.goyourlife.com) 釋出之官方 Android App SDK (`Community Edition`).
 
-Android App 的開發人員，可藉由本 SDK 的整合，便可輕輕鬆鬆快速完成開發。並且，即刻就可直接與市面上 [GOLiFE](http://www.goyourlife.com) 出品銷售之 GOLiFE [Care 系列手環](http://www.goyourlife.com/zh-TW/productlist/#health) 裝置連接。達成包括連線、配對、同步、設定等等各項功能。
+讓任何人都可以藉由本 SDK，直接拿 [GOLiFE 市售手環](http://www.goyourlife.com/zh-TW/productlist/#health) 就可以連接、取資料。
 
-使用範例 : 官方版 GOLiFE's [GoFIT App (Google Play 下載)](https://play.google.com/store/apps/details?id=com.golife.fit&hl=zh_TW).
+
+## What's This?
+- Android App 的開發人員，可藉由本 SDK 的整合，便可輕輕鬆鬆快速完成開發。
+- 並且，即刻就可直接與市面上 [GOLiFE](http://www.goyourlife.com) 出品銷售之 GOLiFE [Care 系列手環](http://www.goyourlife.com/zh-TW/productlist/#health) 裝置連接。達成包括連線、配對、同步、設定等等各項功能。
+- 使用範例 : 官方版 GOLiFE's [GoFIT App (Google Play 下載)](https://play.google.com/store/apps/details?id=com.golife.fit&hl=zh_TW).
 
 
 ## 怎麼開始?? 
