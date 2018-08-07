@@ -1,1 +1,1 @@
-請下載 GoFIT_SDK-release.aar 並將之放在此目錄內。
+請於 [本 project 於 GitHub 上之 release](https://github.com/GO-LiFE/GoFIT_SDK_Android/releases) 下載對應版本的 `GoFIT_SDK-release.aar`，並將之放在此目錄內。

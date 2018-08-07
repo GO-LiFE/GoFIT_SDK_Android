@@ -1,3 +1,5 @@
+![GOLiFE Logo](http://www.goyourlife.com/images/common/logo.png)
+
 # GoFIT SDK for Android — [GOLiFE 手環](http://www.goyourlife.com/zh-TW/productlist/#health) App 介接 SDK
 
 此為 [GOLiFE](http://www.goyourlife.com) 釋出之官方 Android App SDK (`Community Edition`)。
