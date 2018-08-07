@@ -18,7 +18,7 @@ Android App 的開發人員，可藉由本 SDK 的整合，便可輕輕鬆鬆快
 3. 將收到的憑證，整合進您的 App 內 &rArr; 請參考我們的 Wiki : [Demo App (SDK 的安裝與 compile)](/../../wiki/Demo-App-(SDK-%E7%9A%84%E5%AE%89%E8%A3%9D%E8%88%87-compile))
 
 4. Then you are good to go!!! :grin: 就是這麼簡單~
-    - (當然了，您手邊要先有一台我們的裝置囉 — [GOLiFE 手環](http://www.goyourlife.com/zh-TW/productlist/#health))
+    - (當然囉，您手邊必須要先有一台我們的裝置 :stuck_out_tongue_closed_eyes: — [GOLiFE 手環](http://www.goyourlife.com/zh-TW/productlist/#health))
     - 還有，首次啟動，會對您收到的憑證做驗證，並下載授權 &rArr; 所以，首次啟動請要連網喔!!!~
 
 商業用途或是客製合作，都非常歡迎您來信 [聯繫我們](http://www.goyourlife.com/zh-TW/feedback/)
