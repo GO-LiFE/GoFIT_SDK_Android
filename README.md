@@ -9,7 +9,7 @@ Android App 的開發人員，可藉由本 SDK 的整合，便可輕輕鬆鬆快
 使用範例 : 官方版 GOLiFE's [GoFIT App (Google Play 下載)](https://play.google.com/store/apps/details?id=com.golife.fit&hl=zh_TW).
 
 
-## 如何開始??
+## 怎麼開始??
 1. 請到 [Release 區](/../../releases) 下載 : 包括 Demo App 的 source code (壓縮檔) 與 SDK libraray (.a)
 
 2. 再請到 [GoFIT SDK 申請表](https://docs.google.com/forms/d/1WutpWDV6VlGUhq2RZs2takjcGKHctG2GYfNQr81CA-0/) 申請試用憑證
