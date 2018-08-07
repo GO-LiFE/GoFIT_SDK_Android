@@ -33,7 +33,7 @@
 
 
 ## API SPEC
-請參考我們的 [Wiki](/../../wiki) : [API SPEC](/../../wiki/GoFIT-SDK-A-Application-Programming-Interface-Specifications)
+請參考我們的 [Wiki](/../../wiki) : [API SPEC](/../../wiki/GoFIT-SDK-Android-Application-Programming-Interface-Specifications)
 
 
 ## Copyright and License
