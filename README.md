@@ -35,4 +35,6 @@ Android App 的開發人員，可藉由本 SDK 的整合，便可輕輕鬆鬆快
 ## Copyright and License
 此為 `Community Edition`.
 
-智慧財產權為 [GOLiFE](http://www.goyourlife.com) 所有. &copy; 2018 GOYOURLIFE INC. 
+智慧財產權為 [GOLiFE](http://www.goyourlife.com) 所有。
+
+&copy; 2018 GOYOURLIFE INC. 
