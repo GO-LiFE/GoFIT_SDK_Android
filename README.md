@@ -17,7 +17,7 @@
 1. 請到 [Release 區](/../../releases) 下載 : 包括 Demo App 的 source code (壓縮檔) 與 SDK libraray (.aar)
 
 2. 再請到 [GoFIT SDK 申請表](https://docs.google.com/forms/d/1WutpWDV6VlGUhq2RZs2takjcGKHctG2GYfNQr81CA-0/) 申請試用憑證
-    - 請不用擔心，僅是請您留個聯絡方式，只需填寫 email 或電話大名等等，然後選擇您要搭配使用的裝置即可。我們收到後便馬上回覆 30 天的試用憑證給您~
+    - 請不用擔心，僅是請您留個聯絡方式，只需填寫 email 或電話大名等等，然後選擇您要搭配使用的裝置即可。我們收到後便會馬上回覆 30 天的試用憑證給您~
     - 非常歡迎 **為學術研究用途提供更長免費效期** -- 請您只需在申請表上註明，我們都非常樂意為您提供
     - 或是您有意用於 **商業用途或是客製合作**，也是請您在申請表上註明，或是歡迎您來信 [聯繫我們](http://www.goyourlife.com/zh-TW/feedback/)
 
