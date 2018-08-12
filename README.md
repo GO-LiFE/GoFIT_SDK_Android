@@ -2,6 +2,8 @@
 
 # GoFIT SDK for Android — [GOLiFE 手環](http://www.goyourlife.com/zh-TW/productlist/#health) App 介接 SDK
 
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+
 此為 [GOLiFE](http://www.goyourlife.com) 釋出之官方 Android App SDK (`Community Edition`).
 
 讓任何人都可以藉由本 SDK，直接拿 [GOLiFE 市售手環](http://www.goyourlife.com/zh-TW/productlist/#health) 就可以連接、取資料。
