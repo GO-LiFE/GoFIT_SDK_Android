@@ -40,6 +40,31 @@
 ## API SPEC
 請參考我們的 [Wiki](/../../wiki) : [API SPEC](/../../wiki/GoFIT-SDK-Android-Application-Programming-Interface-Specifications)
 
+## SDK 支援的 features 
+
+#### Care 系列手環
+
+|            | Care         | Care-X     | Care-X HR  | Care Xc    | Care Xe    | 
+|:-----------|:-------------|:-----------|:-----------|:-----------|:-----------|
+| 訊息通知 | <ul><li>- [ ] </li></ul> | <ul><li>- [ ] </li></ul> | <ul><li>- [ ] </li></ul> | <ul><li>- [ ] </li></ul> | <ul><li>- [ ] </li></ul> |
+| 基本資料輸入 | <ul><li>- [x] </li></ul> | <ul><li>- [x] </li></ul> | <ul><li>- [x] </li></ul> | <ul><li>- [x] </li></ul> | <ul><li>- [x] </li></ul> |
+| 步數目標 | <ul><li>- [x] </li></ul> | <ul><li>- [x] </li></ul> | <ul><li>- [x] </li></ul> | <ul><li>- [x] </li></ul> | <ul><li>- [x] </li></ul> |
+| 公英制 | <ul><li>- [x] </li></ul> | <ul><li>- [x] </li></ul> | <ul><li>- [x] </li></ul> | <ul><li>- [x] </li></ul> | <ul><li>- [x] </li></ul> |
+| 12/24 時制 | <ul><li>- [x] </li></ul> | <ul><li>- [x] </li></ul> | <ul><li>- [x] </li></ul> | <ul><li>- [x] </li></ul> | <ul><li>- [x] </li></ul> |
+| 左右手 | <ul><li>- [x] </li></ul> | <ul><li>- [x] </li></ul> | <ul><li>- [x] </li></ul> | <ul><li>- [x] </li></ul> | <ul><li>- [x] </li></ul> |
+| 抬手點亮 | <ul><li>- [x] </li></ul> | <ul><li>- [x] </li></ul> | <ul><li>- [x] </li></ul> | <ul><li>- [x] </li></ul> | <ul><li>- [x] </li></ul> |
+| 久坐提醒 | <ul><li>- [x] </li></ul> | <ul><li>- [x] </li></ul> | <ul><li>- [x] </li></ul> | <ul><li>- [x] </li></ul> | <ul><li>- [x] </li></ul> |
+| 防丟提示 | <ul><li>- [x] </li></ul> | <ul><li>- [x] </li></ul> | <ul><li>- [x] </li></ul> | <ul><li>- [x] </li></ul> | <ul><li>- [x] </li></ul> |
+| 勿擾模式 |    |    | <ul><li>- [x] </li></ul> | <ul><li>- [x] </li></ul> | <ul><li>- [x] </li></ul> |
+| 心率定時偵測 |    |    | <ul><li>- [x] </li></ul> | <ul><li>- [x] </li></ul> | <ul><li>- [x] </li></ul> |
+| 心率警示 |    |    |    | <ul><li>- [x] </li></ul> | <ul><li>- [x] </li></ul> |
+| 尋找手環 |    |    |    | <ul><li>- [ ] </li></ul> | <ul><li>- [ ] </li></ul> |
+| 尋找手機 |    |    |    | <ul><li>- [ ] </li></ul> | <ul><li>- [ ] </li></ul> |
+| 遙控拍照 |    |    |    | <ul><li>- [ ] </li></ul> | <ul><li>- [ ] </li></ul> |
+| 螢幕鎖 |    |    |    | <ul><li>- [x] </li></ul> | <ul><li>- [x] </li></ul> |
+| 鬧鐘 | <ul><li>- [x] 30 組 </li></ul> | <ul><li>- [x] 30 組 </li></ul> | <ul><li>- [x] 30 組 </li></ul> | <ul><li>- [x] 30 組 </li></ul> | <ul><li>- [x] 30 組 </li></ul> |
+| 自動睡眠偵測 |    |    | <ul><li>- [x] </li></ul> | <ul><li>- [x] </li></ul> | <ul><li>- [x] </li></ul> |
+| 可同步項目 | <ul><li>- [x] 步數</li><li>- [x] 睡眠</li></ul> | <ul><li>- [x] 步數</li><li>- [x] 睡眠</li></ul> | <ul><li>- [x] 步數</li><li>- [x] 睡眠</li><li>- [x] 心率</li><li>- [ ] 血氧</li></ul> | <ul><li>- [x] 步數</li><li>- [x] 睡眠</li><li>- [x] 心率</li></ul> | <ul><li>- [x] 步數</li><li>- [x] 睡眠</li><li>- [x] 心率</li></ul> |
 
 ## Copyright and License
 此為 `Community Edition`.
