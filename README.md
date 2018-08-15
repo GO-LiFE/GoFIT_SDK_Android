@@ -40,7 +40,7 @@
 ## API SPEC
 請參考我們的 [Wiki](/../../wiki) : [API SPEC](/../../wiki/GoFIT-SDK-Android-Application-Programming-Interface-Specifications)
 
-## SDK 支援的 features 
+## SDK 支援之 features 
 
 #### Care 系列手環
 
