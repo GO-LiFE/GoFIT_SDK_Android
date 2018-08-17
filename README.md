@@ -80,3 +80,5 @@
 &copy; 2018 GOYOURLIFE INC. 
 
 http://www.goyourlife.com
+
+[![GoFIT SDK](./GoFIT_SDK.png)](http://www.goyourlife.com)
