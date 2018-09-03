@@ -22,7 +22,7 @@
 2. 再請到 [GoFIT SDK 申請表](https://docs.google.com/forms/d/1WutpWDV6VlGUhq2RZs2takjcGKHctG2GYfNQr81CA-0/) 申請試用憑證
     - 請不用擔心，僅是請您留個聯絡方式，只需填寫 email 或電話大名等等，然後選擇您要搭配使用的裝置即可。我們收到後便會馬上回覆 30 天的試用憑證給您~
     - 非常歡迎 **為學術研究用途提供更長免費效期** -- 請您只需在申請表上註明，我們都非常樂意為您提供
-    - 或是您有意用於 **商業用途或是客製合作**，也是請您在申請表上註明，或是歡迎您來信 [聯繫我們](http://www.goyourlife.com/zh-TW/feedback/)
+    - 請參見我們的 [定價方案](http://dev.goyourlife.com/price.php)。如果您有意用於 **商業用途或是客製合作**，請您在申請表上註明，或歡迎您來信 [聯繫我們](http://www.goyourlife.com/zh-TW/feedback/)
 
 3. 將收到的憑證，整合進您的 App 內 &rArr; 請參考我們的 Wiki : [Demo App (SDK 的安裝與 compile)](/../../wiki/Demo-App-(SDK-%E7%9A%84%E5%AE%89%E8%A3%9D%E8%88%87-compile))
 
@@ -30,7 +30,7 @@
     - (當然囉，您手邊必須要先有一台我們的裝置 :stuck_out_tongue_closed_eyes: — [GOLiFE 手環](http://www.goyourlife.com/zh-TW/productlist/#health))
     - 還有，首次啟動，會對您收到的憑證做驗證，並下載授權 &rArr; 所以，首次啟動請要連網喔!!!~
 
-**商業用途或是客製合作**，都非常歡迎您來信 [聯繫我們](http://www.goyourlife.com/zh-TW/feedback/)
+請參見我們的 [定價方案](http://dev.goyourlife.com/price.php) &rArr; **商業用途或是客製合作**，都非常歡迎您來信 [聯繫我們](http://www.goyourlife.com/zh-TW/feedback/)。
 
 
 ## Demo App
