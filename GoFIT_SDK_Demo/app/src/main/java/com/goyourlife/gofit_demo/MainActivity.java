@@ -1,8 +1,13 @@
-/**
- * Project : GoFIT SDK
+/*
+ * Copyright (C) GOYOURLIFE INC. - All Rights Reserved.
+ * Unauthorized copying of this file, via any medium is strictly prohibited.
+ * Proprietary and confidential.
+ * Written by Rik Tsai <rik.tsai@goyourlife.com>, July 2018.
  * 
- * Demo App for GoFIT SDK.
+ * Project : GoFIT SDK (code name : GoFIT SDK)
  *
+ * Test App for GoFIT SDK.
+ * 
  * @author Rik Tsai <rik.tsai@goyourlife.com>
  * @link http://www.goyourlife.com
  * @copyright Copyright &copy; 2018 GOYOURLIFE INC.
@@ -10,16 +15,25 @@
 
 package com.goyourlife.gofit_demo;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
+import android.text.InputType;
 import android.util.Log;
 import android.view.WindowManager;
+import android.widget.EditText;
 import android.widget.Toast;
 
+import com.golife.contract.AppContract;
+import com.golife.customizeclass.CareAlarm;
+import com.golife.customizeclass.CareDoNotDisturb;
+import com.golife.customizeclass.CareIdleAlert;
+import com.golife.customizeclass.CareMeasureHR;
 import com.golife.customizeclass.ScanBluetoothDevice;
 import com.golife.customizeclass.SetCareSetting;
 import com.golife.database.table.TablePulseRecord;
@@ -32,8 +46,23 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 
-
 public class MainActivity extends PreferenceActivity implements Preference.OnPreferenceChangeListener, Preference.OnPreferenceClickListener {
+
+    public enum SettingItem {
+        STEP_TARGET,
+        UNIT,
+        TIME_FORMAT,
+        AUTO_SHOW_SCREEN,
+        SIT_REMINDER,
+        BLE_DISCONNECT_NOTIFICATION,
+        HANDEDNESS,
+        ALARM_CLOCK,
+        HR_TIMING_MEASURE,
+        LANGUAGE,
+        DND,
+        SCREEN_LOCK
+    }
+
     private static String _tag = "demo_menu";
     private static GoFITSdk _goFITSdk = null;
     private ScanBluetoothDevice mSelectDevice = null;
@@ -43,6 +72,8 @@ public class MainActivity extends PreferenceActivity implements Preference.OnPre
     private String mProductID = null;
     private String sdk_license = null;
     private String sdk_certificate = null;
+
+    SetCareSetting mCareSettings;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -293,7 +324,7 @@ public class MainActivity extends PreferenceActivity implements Preference.OnPre
                         pPref.setSummary(summary);
 
                         pPref = (Preference) findPreference("demo_function_connect");
-                        pPref.setSummary(mMacAddress);
+                        pPref.setSummary("Connected : " + mMacAddress);
                     }
 
                     @Override
@@ -312,30 +343,11 @@ public class MainActivity extends PreferenceActivity implements Preference.OnPre
             if (_goFITSdk != null) {
                 Log.i(_tag, "demo_function_setting");
 
-                // Demo - doSetSetting API
-                SetCareSetting mCareSettings = demoGenSettingObject();
+                Preference pPref = (Preference) findPreference("demo_function_setting");
+                pPref.setSummary("");
 
-                _goFITSdk.doSetSettings(mCareSettings, new GoFITSdk.SettingsCallback() {
-                    @Override
-                    public void onCompletion() {
-                        Log.i(_tag, "doSetSettings() : onCompletion()");
-                        showToast("Setting OK");
-                        Preference pPref = (Preference) findPreference("demo_function_setting");
-                        String summary = "Setting OK";
-                        pPref.setSummary(summary);
-                    }
-
-                    @Override
-                    public void onProgress(String message) {
-                        Log.i(_tag, "doSetSettings() : onProgress() : message = " + message);
-                    }
-
-                    @Override
-                    public void onFailure(int errorCode, String errorMsg) {
-                        Log.e(_tag, "doSetSettings() : onFailure() : errorCode = " + errorCode + ", " + "errorMsg = " + errorMsg);
-                        showToast("doSetSettings() : onFailure() : errorCode = " + errorCode + ", " + "errorMsg = " + errorMsg);
-                    }
-                });
+                mCareSettings = _goFITSdk.getNewCareSettings();
+                displaySettingMainMenu();
             }
             else {
                 showToast("SDK Instance invalid, needs `SDK init`");
@@ -679,5 +691,517 @@ public class MainActivity extends PreferenceActivity implements Preference.OnPre
 
     void showToast(String text) {
         Toast.makeText(MainActivity.this, text, Toast.LENGTH_SHORT).show();
+    }
+
+    void demoSetSettingToDevice() {
+        // Demo - doSetSetting API
+        _goFITSdk.doSetSettings(mCareSettings, new GoFITSdk.SettingsCallback() {
+            @Override
+            public void onCompletion() {
+                Log.i(_tag, "doSetSettings() : onCompletion()");
+                showToast("Setting OK");
+                Preference pPref = (Preference) findPreference("demo_function_setting");
+                String summary = "Setting OK";
+                pPref.setSummary(summary);
+            }
+
+            @Override
+            public void onProgress(String message) {
+                Log.i(_tag, "doSetSettings() : onProgress() : message = " + message);
+            }
+
+            @Override
+            public void onFailure(int errorCode, String errorMsg) {
+                Log.e(_tag, "doSetSettings() : onFailure() : errorCode = " + errorCode + ", " + "errorMsg = " + errorMsg);
+                showToast("doSetSettings() : onFailure() : errorCode = " + errorCode + ", " + "errorMsg = " + errorMsg);
+            }
+        });
+
+    }
+
+    void displaySettingMainMenu() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Setting Option");
+        builder.setMessage("1 : Step Target\n" +
+                "2 : Unit\n" +
+                "3 : Time Format\n" +
+                "4 : Auto Show Screen\n" +
+                "5 : Sit Reminder\n" +
+                "6 : BLE Disconnect Notification\n" +
+                "7 : Handedness\n" +
+                "8 : Alarm Clock\n" +
+                "9 : HR Timing Measure\n" +
+                "10 : Language\n" +
+                "11 : Do Not Disturb \n" +
+                "12 : Screen Lock \n" +
+                "\n\n999 : Restore default setting");
+
+        final EditText input = new EditText(this);
+        input.setInputType(InputType.TYPE_CLASS_TEXT);
+        builder.setView(input);
+
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                String userInput = input.getText().toString();
+                String instructions = "";
+                switch (userInput) {
+                    case "1" :
+                        instructions = "format : [target]\ne.g : 8000";
+                        displaySettingDetail(instructions, SettingItem.STEP_TARGET);
+                        break;
+                    case "2" :
+                        instructions = "format : [\"imperial\" / \"metric\"]\ne.g : imperial";
+                        displaySettingDetail(instructions, SettingItem.UNIT);
+                        break;
+                    case "3" :
+                        instructions = "format : [\"12\" / \"24\"]\ne.g : 12";
+                        displaySettingDetail(instructions, SettingItem.TIME_FORMAT);
+                        break;
+                    case "4" :
+                        instructions = "format : [0:off / 1:on]\ne.g : 1";
+                        displaySettingDetail(instructions, SettingItem.AUTO_SHOW_SCREEN);
+                        break;
+                    case "5" :
+                        instructions = "format : [on/off], [repeatDays(0~127 bit operator)], [HH:mm(startTime)], [HH:mm(endTime)], [IntervalMin]\ne.g : on,127,09:30,18:30,15";
+                        displaySettingDetail(instructions, SettingItem.SIT_REMINDER);
+                        break;
+                    case "6" :
+                        instructions = "format : [0:off / 1:on]\ne.g : 1";
+                        displaySettingDetail(instructions, SettingItem.BLE_DISCONNECT_NOTIFICATION);
+                        break;
+                    case "7" :
+                        instructions = "format : [\"left\" / \"right\"]\ne.g : left";
+                        displaySettingDetail(instructions, SettingItem.HANDEDNESS);
+                        break;
+                    case "8" :
+                        instructions = "format : [on/off], [repeatDays(0~127 bit operator)], [HH:mm], [category]\ne.g : on,0,07:30,0";
+                        displaySettingDetail(instructions, SettingItem.ALARM_CLOCK);
+                        break;
+                    case "9" :
+                        instructions = "format : [0:off / 1:on]\ne.g : 1";
+                        displaySettingDetail(instructions, SettingItem.HR_TIMING_MEASURE);
+                        break;
+                    case "10" :
+                        instructions = "format : [0:TW / 1:CN / 2:EN / 3:JP]\ne.g : 2";
+                        displaySettingDetail(instructions, SettingItem.LANGUAGE);
+                        break;
+                    case "11" :
+                        instructions = "format : [0:off / 1:on]\ne.g : 1";
+                        displaySettingDetail(instructions, SettingItem.DND);
+                        break;
+                    case "12" :
+                        instructions = "format : [0:off / 1:on]\ne.g : 1";
+                        displaySettingDetail(instructions, SettingItem.SCREEN_LOCK);
+                        break;
+                    case "999" :
+                        mCareSettings = _goFITSdk.getDefaultCareSettings();
+                        demoSetSettingToDevice();
+                        break;
+                    default :
+                        showToast("Invalid input");
+                        break;
+                }
+            }
+        });
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+
+        builder.show();
+    }
+
+    void displaySettingDetail(String instructions, final SettingItem setting) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("");
+        builder.setMessage(instructions);
+
+        final EditText input = new EditText(this);
+        input.setInputType(InputType.TYPE_CLASS_TEXT);
+        builder.setView(input);
+
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                String userInput = input.getText().toString();
+                switch (setting) {
+                    case STEP_TARGET:
+                        demoSettingStepTarget(userInput);
+                        break;
+                    case UNIT:
+                        demoSettingUnit(userInput);
+                        break;
+                    case TIME_FORMAT:
+                        demoSettingTimeFormat(userInput);
+                        break;
+                    case AUTO_SHOW_SCREEN:
+                        demoSettingAutoShowScreen(userInput);
+                        break;
+                    case SIT_REMINDER:
+                        demoSettingSitReminder(userInput);
+                        break;
+                    case BLE_DISCONNECT_NOTIFICATION:
+                        demoSettingBLEDisconnectNotification(userInput);
+                        break;
+                    case HANDEDNESS:
+                        demoSettingHandedness(userInput);
+                        break;
+                    case ALARM_CLOCK:
+                        demoSettingAlarmClock(userInput);
+                        break;
+                    case HR_TIMING_MEASURE:
+                        demoSettingHRTimingMeasure(userInput);
+                        break;
+                    case LANGUAGE:
+                        demoSettingLanguage(userInput);
+                        break;
+                    case DND:
+                        demoSettingDND(userInput);
+                        break;
+                    case SCREEN_LOCK:
+                        demoSettingScreenLock(userInput);
+                        break;
+                }
+            }
+        });
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+
+        builder.show();
+    }
+
+    void demoSettingStepTarget(String userInput) {
+        try {
+            // Demo - step target setting
+            int target = Integer.valueOf(userInput);
+            mCareSettings.setStepGoal(target);
+            demoSetSettingToDevice();
+        }
+        catch (NumberFormatException e) {
+            showToast("Error Format (not number format)");
+        }
+    }
+
+    void demoSettingUnit(String userInput) {
+        if (userInput.equals("imperial") || userInput.equals("metric")) {
+            // Demo - system unit setting
+            String systemUnit = userInput;
+            mCareSettings.setSystemUnit(systemUnit);
+            demoSetSettingToDevice();
+        }
+        else {
+            showToast("Error Format (invalid string : must be `imperial` or `metric`)");
+        }
+    }
+
+    void demoSettingTimeFormat(String userInput) {
+        if (userInput.equals("12") || userInput.equals("24")) {
+            // Demo - time format setting
+            String timeFormat = userInput;
+            mCareSettings.setTimeFormat(timeFormat);
+            demoSetSettingToDevice();
+        }
+        else {
+            showToast("Error Format (invalid string : must be `12` or `24`)");
+        }
+    }
+
+    void demoSettingAutoShowScreen(String userInput) {
+        if (userInput.equals("0") || userInput.equals("1")) {
+            // Demo - auto show screen setting
+            SetCareSetting.Switch setting = SetCareSetting.Switch.None;
+            if (userInput.equals("1")) {
+                setting = SetCareSetting.Switch.True;
+            }
+            else {
+                setting = SetCareSetting.Switch.False;
+            }
+            mCareSettings.setEnableAutoLightUp(setting);
+            demoSetSettingToDevice();
+        }
+        else {
+            showToast("Error Format (invalid input : must be `0` or `1`)");
+        }
+    }
+
+    void demoSettingSitReminder(String userInput) {
+        String[] separated = userInput.split(",");
+        // Demo - sit reminder setting
+        CareIdleAlert setting = mCareSettings.getIdleAlert();
+        if (separated.length == 5) {
+            if (separated[0].equals("on") || separated[1].equals("off")) {
+                boolean enable = separated[0].equals("on") ? true : false;
+                setting.setEnableIdleAlert(enable);
+            }
+            else {
+                showToast("Error Format (invalid input : must be `on` or `off`)");
+                return;
+            }
+
+            try {
+                int repeatDays = Integer.valueOf(separated[1]);
+                if (repeatDays >= 0 && repeatDays <= 127) {
+                    byte[] bytesRepeatDay = convertRepeatDay(repeatDays);
+                    setting.setRepeatDays(bytesRepeatDay);
+                }
+                else {
+                    showToast("Error Format (invalid range : 0~127)");
+                    return;
+                }
+
+            }
+            catch (NumberFormatException e) {
+                showToast("Error Format (not number format)");
+                return;
+            }
+
+            int startMin = convertHHmmToMin(separated[2]);
+            if (startMin >= 0 && startMin <= 1439) {
+                setting.setStartMin((short) startMin);
+            }
+            else {
+                showToast("Error Format (invalid time format)");
+            }
+
+            int endMin = convertHHmmToMin(separated[3]);
+            if (endMin >= 0 && endMin <= 1439) {
+                setting.setEndMin((short) endMin);
+            }
+            else {
+                showToast("Error Format (invalid time format)");
+            }
+
+            try {
+                int intervalMin = Integer.valueOf(separated[4]);
+                setting.setInterval((short)intervalMin);
+            }
+            catch (NumberFormatException e) {
+                showToast("Error Format (not number format)");
+                return;
+            }
+
+            mCareSettings.setIdleAlert(setting);
+            demoSetSettingToDevice();
+        }
+        else {
+            showToast("Error Format (invalid parameter counts)");
+            return;
+        }
+    }
+
+    void demoSettingBLEDisconnectNotification(String userInput) {
+        if (userInput.equals("0") || userInput.equals("1")) {
+            // Demo - BLE disconnect alert setting
+            SetCareSetting.Switch setting = SetCareSetting.Switch.None;
+            if (userInput.equals("1")) {
+                setting = SetCareSetting.Switch.True;
+            }
+            else {
+                setting = SetCareSetting.Switch.False;
+            }
+            mCareSettings.setEnableDisconnectAlert(setting);
+            demoSetSettingToDevice();
+        }
+        else {
+            showToast("Error Format (invalid input : must be `0` or `1`)");
+        }
+    }
+
+    void demoSettingHandedness(String userInput) {
+        if (userInput.equals("left") || userInput.equals("right")) {
+            // Demo - handedness setting
+            mCareSettings.setHandedness(userInput);
+            demoSetSettingToDevice();
+        }
+        else {
+            showToast("Error Format (invalid input : must be `left` or `right`)");
+        }
+    }
+
+    void demoSettingAlarmClock(String userInput) {
+        String[] separated = userInput.split(",");
+        if (separated.length == 4) {
+            // Demo - alarm clock setting
+            CareAlarm careAlarms = mCareSettings.getAlarms();
+            ArrayList<CareAlarm.Alarm> alarms = careAlarms.getAlarms();
+            CareAlarm.Alarm setting = alarms.get(0);
+            if (separated[0].equals("on") || separated[1].equals("off")) {
+                boolean enable = separated[0].equals("on") ? true : false;
+                setting.setEnableAlarm(enable);
+                setting.setIsActive(enable);
+            }
+            else {
+                showToast("Error Format (invalid input : must be `on` or `off`)");
+                return;
+            }
+
+            try {
+                int repeatDays = Integer.valueOf(separated[1]).intValue();
+                if (repeatDays >= 0 && repeatDays <= 127) {
+                    byte[] bytesRepeatDay = convertRepeatDay(repeatDays);
+                    setting.setRepeatDays(bytesRepeatDay);
+                }
+                else {
+                    showToast("Error Format (invalid range : 0~127)");
+                    return;
+                }
+
+            }
+            catch (NumberFormatException e) {
+                showToast("Error Format (not number format)");
+                return;
+            }
+
+            int reminderTime = convertHHmmToMin(separated[2]) * 60;  // input must be `seconds`
+            if (reminderTime >= 0 && reminderTime <= 86399) {
+                setting.setReminderTime(reminderTime);
+            }
+            else {
+                showToast("Error Format (invalid time format)");
+                return;
+            }
+
+            try {
+                int category = Integer.valueOf(separated[3]).intValue();
+                if (category >= 0 && category <= 7) {
+                    setting.setCategory((short) category);
+                }
+                else {
+                    showToast("Error Format (invalid range : 0~7)");
+                    return;
+                }
+            }
+            catch (NumberFormatException e) {
+                showToast("Error Format (not number format)");
+                return;
+            }
+
+            alarms.set(0, setting);
+            careAlarms.setAlarms(alarms);
+            mCareSettings.setAlarms(careAlarms);
+            demoSetSettingToDevice();
+        }
+        else {
+            showToast("Error Format (invalid parameter counts)");
+        }
+    }
+
+    void demoSettingHRTimingMeasure(String userInput) {
+        if (userInput.equals("0") || userInput.equals("1")) {
+            // Demo - HR timing measure setting
+            CareMeasureHR setting = mCareSettings.getMeasureHR();
+            boolean enable = userInput.equals("1") ? true : false;
+            setting.setEnableMeasureHR(enable);
+            setting.setRepeatDays(convertRepeatDay(127));
+            setting.setStartMin((short)convertHHmmToMin("00:00"));
+            setting.setEndMin((short)convertHHmmToMin("23:59"));
+            setting.setInterval((short)30);
+            mCareSettings.setMeasureHR(setting);
+            demoSetSettingToDevice();
+        }
+        else {
+            showToast("Error Format (invalid input : must be `0` or `1`)");
+        }
+    }
+
+    void demoSettingLanguage(String userInput) {
+        // Demo - language setting
+        AppContract.SystemLanguage language;
+        if (userInput.equals("0")) {
+            language = AppContract.SystemLanguage.zhrTW;
+            mCareSettings.setSystemLanguage(language);
+            demoSetSettingToDevice();
+        }
+        else if (userInput.equals("1")) {
+            language = AppContract.SystemLanguage.zhrCN;
+            mCareSettings.setSystemLanguage(language);
+            demoSetSettingToDevice();
+        }
+        else if (userInput.equals("2")) {
+            language = AppContract.SystemLanguage.en;
+            mCareSettings.setSystemLanguage(language);
+            demoSetSettingToDevice();
+        }
+        else if (userInput.equals("3")) {
+            language = AppContract.SystemLanguage.ja;
+            mCareSettings.setSystemLanguage(language);
+            demoSetSettingToDevice();
+        }
+        else {
+            showToast("Error Format (invalid input)");
+        }
+    }
+
+    void demoSettingDND(String userInput) {
+        if (userInput.equals("0") || userInput.equals("1")) {
+            // Demo - DND setting
+            CareDoNotDisturb setting = mCareSettings.getDoNotDisturb();
+            boolean enable = userInput.equals("1") ? true : false;
+            setting.setEnableDoNotDisturb(enable);
+            setting.setRepeatDays(convertRepeatDay(127));
+            setting.setStartMin((short)convertHHmmToMin("22:00"));
+            setting.setEndMin((short)convertHHmmToMin("07:30"));
+            mCareSettings.setDoNotDisturb(setting);
+            demoSetSettingToDevice();
+        }
+        else {
+            showToast("Error Format (invalid input : must be `0` or `1`)");
+        }
+    }
+
+    void demoSettingScreenLock(String userInput) {
+        if (userInput.equals("0") || userInput.equals("1")) {
+            // Demo - screen lock setting
+            SetCareSetting.Switch setting = SetCareSetting.Switch.None;
+            if (userInput.equals("1")) {
+                setting = SetCareSetting.Switch.True;
+            }
+            else {
+                setting = SetCareSetting.Switch.False;
+            }
+            mCareSettings.setEnableHorizontalUnlock(setting);
+            demoSetSettingToDevice();
+        }
+        else {
+            showToast("Error Format (invalid input : must be `0` or `1`)");
+        }
+    }
+
+    byte[] convertRepeatDay(int days) {
+        byte[] repeatDays = {0, 0, 0, 0, 0, 0, 0};
+        try {
+            repeatDays[0] = (byte) (((days & 0x01) == 1) ? 1 : 0);
+            repeatDays[1] = (byte) ((((days >> 1) & 0x01) == 1) ? 1 : 0);
+            repeatDays[2] = (byte) ((((days >> 2) & 0x01) == 1) ? 1 : 0);
+            repeatDays[3] = (byte) ((((days >> 3) & 0x01) == 1) ? 1 : 0);
+            repeatDays[4] = (byte) ((((days >> 4) & 0x01) == 1) ? 1 : 0);
+            repeatDays[5] = (byte) ((((days >> 5) & 0x01) == 1) ? 1 : 0);
+            repeatDays[6] = (byte) ((((days >> 6) & 0x01) == 1) ? 1 : 0);
+        } catch (Exception e) {
+            for (int i = 0; i < repeatDays.length; i++) {
+                repeatDays[i] = 0;
+            }
+        }
+
+        return repeatDays;
+    }
+
+    int convertHHmmToMin(String HHmm) {
+        try {
+            String[] timestamp = HHmm.split(":");
+            int hour = Integer.parseInt(timestamp[0]);
+            int minute = Integer.parseInt(timestamp[1]);
+            return (hour * 60 + minute);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0;
+        }
     }
 }
