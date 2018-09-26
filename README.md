@@ -17,7 +17,7 @@
 
 
 ## 從哪開始?? 
-1. 請到 [Release 區](/../../releases) 下載 : 包括 Demo App 的 source code (壓縮檔) 與 SDK libraray (.aar)
+1. 請到 [Release 區](/../../releases) 下載 : 包括 Demo App 的 source code (壓縮檔) 與 SDK library (.aar)
 
 2. 再請到 [GoFIT SDK 申請表](https://docs.google.com/forms/d/1WutpWDV6VlGUhq2RZs2takjcGKHctG2GYfNQr81CA-0/) 申請試用憑證
     - 請不用擔心，僅是請您留個聯絡方式，只需填寫 email 或電話大名等等，然後選擇您要搭配使用的裝置即可。我們收到後便會馬上回覆 30 天的試用憑證給您~
