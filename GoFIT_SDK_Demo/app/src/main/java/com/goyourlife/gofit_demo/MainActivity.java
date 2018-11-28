@@ -16,10 +16,16 @@
 package com.goyourlife.gofit_demo;
 
 import android.app.AlertDialog;
+import android.app.Service;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.hardware.Camera;
+import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Vibrator;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
@@ -32,14 +38,19 @@ import android.widget.Toast;
 import com.golife.contract.AppContract;
 import com.golife.customizeclass.CareAlarm;
 import com.golife.customizeclass.CareDoNotDisturb;
+import com.golife.customizeclass.CareHRWarning;
 import com.golife.customizeclass.CareIdleAlert;
 import com.golife.customizeclass.CareMeasureHR;
 import com.golife.customizeclass.ScanBluetoothDevice;
 import com.golife.customizeclass.SetCareSetting;
 import com.golife.database.table.TablePulseRecord;
 import com.golife.database.table.TableSleepRecord;
+import com.golife.database.table.TableSpO2Record;
 import com.golife.database.table.TableStepRecord;
 import com.goyourlife.gofitsdk.GoFITSdk;
+import com.goyourlife.remotecamera.CameraClass;
+import com.goyourlife.remotecamera.RemoteCamera;
+import com.goyourlife.service.NotificationListenerService;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -60,11 +71,12 @@ public class MainActivity extends PreferenceActivity implements Preference.OnPre
         HR_TIMING_MEASURE,
         LANGUAGE,
         DND,
-        SCREEN_LOCK
+        SCREEN_LOCK,
+        HR_WARNING
     }
 
     private static String _tag = "demo_menu";
-    private static GoFITSdk _goFITSdk = null;
+    public static GoFITSdk _goFITSdk = null;
     private ScanBluetoothDevice mSelectDevice = null;
     private String mMacAddress = null;
     private String mPairingCode = null;
@@ -100,6 +112,25 @@ public class MainActivity extends PreferenceActivity implements Preference.OnPre
             Log.e(_tag, e.toString());
             showToast("Exception : " + e.toString());
         }
+
+        String enabledListeners = android.provider.Settings.Secure.getString(getContentResolver(), "enabled_notification_listeners");
+        if (enabledListeners == null || !enabledListeners.contains(NotificationListenerService.class.getName()))  {
+            new AlertDialog.Builder(this)
+                    .setTitle("Tips")
+                    .setMessage("If you want to use smart band notification function, please open APP Notifications of Settings in your smart phone. (Set APP as whitelist to prevent it from being cleaned up.)")
+                    .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            try {
+                                MainActivity.this.startActivity(new Intent("android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS"));
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }).setNegativeButton("Cancel", null).show();
+        }
+
+        CameraClass.checkPermission(AppContract.PermissionType.storage, this);
     }
 
     void InitUI() {
@@ -128,10 +159,16 @@ public class MainActivity extends PreferenceActivity implements Preference.OnPre
         pPref = (Preference) findPreference("demo_function_init");
         pPref.setOnPreferenceClickListener(this);
 
+        pPref = (Preference) findPreference("demo_function_find_my_care");
+        pPref.setOnPreferenceClickListener(this);
+
         pPref = (Preference) findPreference("demo_function_dfu");
         pPref.setOnPreferenceClickListener(this);
 
         pPref = (Preference) findPreference("demo_function_disconnect");
+        pPref.setOnPreferenceClickListener(this);
+
+        pPref = (Preference) findPreference("demo_function_set_connect_timeout");
         pPref.setOnPreferenceClickListener(this);
 
         pPref = (Preference) findPreference("demo_battery");
@@ -240,7 +277,7 @@ public class MainActivity extends PreferenceActivity implements Preference.OnPre
                         Preference pPref = (Preference) findPreference("demo_function_scan");
                         if (devices.size() > 0) {
                             mSelectDevice = devices.get(0);
-                            String summary = "Recommend Device : \n" + mSelectDevice.getDevice().getAddress() + ", " + mSelectDevice.getRSSI();
+                            String summary = "Recommended Device : \n" + mSelectDevice.getDevice().getAddress() + ", " + mSelectDevice.getRSSI();
                             pPref.setSummary(summary);
                             Log.i(_tag, "doScanDevice() : onCompletion() : mSelectDevice = " + mSelectDevice.getDevice().getName() + ", " + mSelectDevice.getDevice().getAddress() + ", " + mSelectDevice.getRSSI() + ", " + mSelectDevice.getProductID());
                         } else {
@@ -325,6 +362,9 @@ public class MainActivity extends PreferenceActivity implements Preference.OnPre
 
                         pPref = (Preference) findPreference("demo_function_connect");
                         pPref.setSummary("Connected : " + mMacAddress);
+
+                        // Demo - setRemoteCameraHandler API
+                        demoSetRemoteCameraHandler();
                     }
 
                     @Override
@@ -346,7 +386,9 @@ public class MainActivity extends PreferenceActivity implements Preference.OnPre
                 Preference pPref = (Preference) findPreference("demo_function_setting");
                 pPref.setSummary("");
 
-                mCareSettings = _goFITSdk.getNewCareSettings();
+                if (mCareSettings == null) {
+                    mCareSettings = _goFITSdk.getNewCareSettings();
+                }
                 displaySettingMainMenu();
             }
             else {
@@ -381,7 +423,7 @@ public class MainActivity extends PreferenceActivity implements Preference.OnPre
                     }
 
                     @Override
-                    public void onGetFitnessData(ArrayList<TableStepRecord> stepRecords, ArrayList<TableSleepRecord> sleepRecords, ArrayList<TablePulseRecord> hrRecords) {
+                    public void onGetFitnessData(ArrayList<TableStepRecord> stepRecords, ArrayList<TableSleepRecord> sleepRecords, ArrayList<TablePulseRecord> hrRecords, ArrayList<TableSpO2Record> spo2Records) {
                         for (TableStepRecord step : stepRecords) {
                             Log.i(_tag, "doSyncFitnessData() : onGetFitnessData() : step = " + step.toJSONString());
                         }
@@ -392,6 +434,10 @@ public class MainActivity extends PreferenceActivity implements Preference.OnPre
 
                         for (TablePulseRecord hr : hrRecords) {
                             Log.i(_tag, "doSyncFitnessData() : onGetFitnessData() : hr = " + hr.toJSONString());
+                        }
+
+                        for (TableSpO2Record spo2 : spo2Records) {
+                            Log.i(_tag, "doSyncFitnessData() : onGetFitnessData() : spo2 = " + spo2.toJSONString());
                         }
                     }
                 });
@@ -443,6 +489,18 @@ public class MainActivity extends PreferenceActivity implements Preference.OnPre
                         showToast("doInitialDevice() : onFailure() : errorCode = " + errorCode + ", " + "errorMsg = " + errorMsg);
                     }
                 });
+            }
+            else {
+                showToast("SDK Instance invalid, needs `SDK init`");
+            }
+        }
+
+        else if (preference.getKey().equals("demo_function_find_my_care")) {
+            if (_goFITSdk != null) {
+                Log.i(_tag, "demo_function_find_my_care");
+
+                // Demo - doFindMyCare API
+                _goFITSdk.doFindMyCare(3);
             }
             else {
                 showToast("SDK Instance invalid, needs `SDK init`");
@@ -528,6 +586,60 @@ public class MainActivity extends PreferenceActivity implements Preference.OnPre
 
                 pPref = (Preference) findPreference("demo_function_dfu");
                 pPref.setSummary("");
+            }
+            else {
+                showToast("SDK Instance invalid, needs `SDK init`");
+            }
+        }
+
+        else if (preference.getKey().equals("demo_function_set_connect_timeout")) {
+            if (_goFITSdk != null) {
+                Log.i(_tag, "demo_function_set_connect_timeout");
+
+                SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
+                final SharedPreferences.Editor pe = sp.edit();
+                mProductID = sp.getString("productID", "");
+                pe.apply();
+
+                if (mProductID.length() > 0 && mProductID != null) {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                    builder.setMessage("Set timeout (default is 60s)");
+
+                    final EditText input = new EditText(this);
+                    input.setInputType(InputType.TYPE_CLASS_TEXT);
+                    builder.setView(input);
+
+                    builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            try {
+                                String userInput = input.getText().toString();
+                                int timeout = Integer.valueOf(userInput);
+
+                                // Demo - setConnectTimeout API
+                                _goFITSdk.setConnectTimeout(mProductID, timeout);
+
+                                Preference pPref = (Preference) findPreference("demo_function_set_connect_timeout");
+                                String summary = String.format("%d s", timeout);
+                                pPref.setSummary(summary);
+                            }
+                            catch (NumberFormatException e) {
+                                showToast("Error Format (not number format)");
+                            }
+                        }
+                    });
+                    builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.cancel();
+                        }
+                    });
+
+                    builder.show();
+                }
+                else {
+                    showToast("`New Pairing` first!");
+                }
             }
             else {
                 showToast("SDK Instance invalid, needs `SDK init`");
@@ -674,6 +786,9 @@ public class MainActivity extends PreferenceActivity implements Preference.OnPre
                         boolean isConnect = _goFITSdk.isBLEConnect();
                         summary = isConnect ? "Connected" : "Disconnected";
                         pPref.setSummary(summary);
+
+                        // Demo - setRemoteCameraHandler API
+                        demoSetRemoteCameraHandler();
                     }
 
                     @Override
@@ -734,6 +849,7 @@ public class MainActivity extends PreferenceActivity implements Preference.OnPre
                 "10 : Language\n" +
                 "11 : Do Not Disturb \n" +
                 "12 : Screen Lock \n" +
+                "13 : HR Warning\n" +
                 "\n\n999 : Restore default setting");
 
         final EditText input = new EditText(this);
@@ -775,11 +891,11 @@ public class MainActivity extends PreferenceActivity implements Preference.OnPre
                         displaySettingDetail(instructions, SettingItem.HANDEDNESS);
                         break;
                     case "8" :
-                        instructions = "format : [on/off], [repeatDays(0~127 bit operator)], [HH:mm], [category]\ne.g : on,0,07:30,0";
+                        instructions = "format : [on/off], [index(0~29)], [repeatDays(0~127 bit operator)], [HH:mm], [category]\ne.g : on,2,0,07:30,0";
                         displaySettingDetail(instructions, SettingItem.ALARM_CLOCK);
                         break;
                     case "9" :
-                        instructions = "format : [0:off / 1:on]\ne.g : 1";
+                        instructions = "format : [on/off], [HH:mm(startTime)], [HH:mm(endTime)], [IntervalMin]\ne.g : on,00:00,23:59,15";
                         displaySettingDetail(instructions, SettingItem.HR_TIMING_MEASURE);
                         break;
                     case "10" :
@@ -793,6 +909,10 @@ public class MainActivity extends PreferenceActivity implements Preference.OnPre
                     case "12" :
                         instructions = "format : [0:off / 1:on]\ne.g : 1";
                         displaySettingDetail(instructions, SettingItem.SCREEN_LOCK);
+                        break;
+                    case "13" :
+                        instructions = "format : [on/off], [max warning], [min warning]\ne.g : on,170,50 (max value must larger than min value)";
+                        displaySettingDetail(instructions, SettingItem.HR_WARNING);
                         break;
                     case "999" :
                         mCareSettings = _goFITSdk.getDefaultCareSettings();
@@ -864,6 +984,9 @@ public class MainActivity extends PreferenceActivity implements Preference.OnPre
                     case SCREEN_LOCK:
                         demoSettingScreenLock(userInput);
                         break;
+                    case HR_WARNING:
+                        demoSettingHRWarning(userInput);
+                        break;
                 }
             }
         });
@@ -934,9 +1057,9 @@ public class MainActivity extends PreferenceActivity implements Preference.OnPre
     void demoSettingSitReminder(String userInput) {
         String[] separated = userInput.split(",");
         // Demo - sit reminder setting
-        CareIdleAlert setting = mCareSettings.getIdleAlert();
+        CareIdleAlert setting = mCareSettings.getDefaultIdleAlert();
         if (separated.length == 5) {
-            if (separated[0].equals("on") || separated[1].equals("off")) {
+            if (separated[0].equals("on") || separated[0].equals("off")) {
                 boolean enable = separated[0].equals("on") ? true : false;
                 setting.setEnableIdleAlert(enable);
             }
@@ -1027,12 +1150,31 @@ public class MainActivity extends PreferenceActivity implements Preference.OnPre
 
     void demoSettingAlarmClock(String userInput) {
         String[] separated = userInput.split(",");
-        if (separated.length == 4) {
+        if (separated.length == 5) {
             // Demo - alarm clock setting
             CareAlarm careAlarms = mCareSettings.getAlarms();
+            if (careAlarms == null) {
+                careAlarms = mCareSettings.getDefaultAlarms();
+            }
             ArrayList<CareAlarm.Alarm> alarms = careAlarms.getAlarms();
-            CareAlarm.Alarm setting = alarms.get(0);
-            if (separated[0].equals("on") || separated[1].equals("off")) {
+            CareAlarm.Alarm setting = null;
+            int index = 0;
+            try {
+                index = Integer.valueOf(separated[1]).intValue();
+                if (index >= 0 && index <= 29) {
+                    setting = alarms.get(index);
+                }
+                else {
+                    showToast("Error Format [index] (invalid range : 0~29)");
+                    return;
+                }
+            }
+            catch (NumberFormatException e) {
+                showToast("Error Format (not number format)");
+                return;
+            }
+
+            if (separated[0].equals("on") || separated[0].equals("off")) {
                 boolean enable = separated[0].equals("on") ? true : false;
                 setting.setEnableAlarm(enable);
                 setting.setIsActive(enable);
@@ -1043,13 +1185,13 @@ public class MainActivity extends PreferenceActivity implements Preference.OnPre
             }
 
             try {
-                int repeatDays = Integer.valueOf(separated[1]).intValue();
+                int repeatDays = Integer.valueOf(separated[2]).intValue();
                 if (repeatDays >= 0 && repeatDays <= 127) {
                     byte[] bytesRepeatDay = convertRepeatDay(repeatDays);
                     setting.setRepeatDays(bytesRepeatDay);
                 }
                 else {
-                    showToast("Error Format (invalid range : 0~127)");
+                    showToast("Error Format [repeatDays] (invalid range : 0~127)");
                     return;
                 }
 
@@ -1059,22 +1201,22 @@ public class MainActivity extends PreferenceActivity implements Preference.OnPre
                 return;
             }
 
-            int reminderTime = convertHHmmToMin(separated[2]) * 60;  // input must be `seconds`
+            int reminderTime = convertHHmmToMin(separated[3]) * 60;  // input must be `seconds`
             if (reminderTime >= 0 && reminderTime <= 86399) {
                 setting.setReminderTime(reminderTime);
             }
             else {
-                showToast("Error Format (invalid time format)");
+                showToast("Error Format [reminderTime] (invalid time format)");
                 return;
             }
 
             try {
-                int category = Integer.valueOf(separated[3]).intValue();
+                int category = Integer.valueOf(separated[4]).intValue();
                 if (category >= 0 && category <= 7) {
                     setting.setCategory((short) category);
                 }
                 else {
-                    showToast("Error Format (invalid range : 0~7)");
+                    showToast("Error Format [category] (invalid range : 0~7)");
                     return;
                 }
             }
@@ -1083,7 +1225,7 @@ public class MainActivity extends PreferenceActivity implements Preference.OnPre
                 return;
             }
 
-            alarms.set(0, setting);
+            alarms.set(index, setting);
             careAlarms.setAlarms(alarms);
             mCareSettings.setAlarms(careAlarms);
             demoSetSettingToDevice();
@@ -1094,20 +1236,50 @@ public class MainActivity extends PreferenceActivity implements Preference.OnPre
     }
 
     void demoSettingHRTimingMeasure(String userInput) {
-        if (userInput.equals("0") || userInput.equals("1")) {
+        String[] separated = userInput.split(",");
+        if (separated.length == 4) {
             // Demo - HR timing measure setting
-            CareMeasureHR setting = mCareSettings.getMeasureHR();
-            boolean enable = userInput.equals("1") ? true : false;
-            setting.setEnableMeasureHR(enable);
-            setting.setRepeatDays(convertRepeatDay(127));
-            setting.setStartMin((short)convertHHmmToMin("00:00"));
-            setting.setEndMin((short)convertHHmmToMin("23:59"));
-            setting.setInterval((short)30);
-            mCareSettings.setMeasureHR(setting);
+            CareMeasureHR careMeasureHR = mCareSettings.getDefaultMeasureHR();
+            careMeasureHR.setRepeatDays(convertRepeatDay(127));
+            if (separated[0].equals("on") || separated[0].equals("off")) {
+                boolean enable = separated[0].equals("on") ? true : false;
+                careMeasureHR.setEnableMeasureHR(enable);
+            }
+            else {
+                showToast("Error Format (invalid input : must be `on` or `off`)");
+                return;
+            }
+
+            int startMin = convertHHmmToMin(separated[1]);
+            if (startMin >= 0 && startMin <= 1439) {
+                careMeasureHR.setStartMin((short) startMin);
+            }
+            else {
+                showToast("Error Format (invalid time format)");
+            }
+
+            int endMin = convertHHmmToMin(separated[2]);
+            if (endMin >= 0 && endMin <= 1439) {
+                careMeasureHR.setEndMin((short) endMin);
+            }
+            else {
+                showToast("Error Format (invalid time format)");
+            }
+
+            try {
+                int intervalMin = Integer.valueOf(separated[3]);
+                careMeasureHR.setInterval((short)intervalMin);
+            }
+            catch (NumberFormatException e) {
+                showToast("Error Format (not number format)");
+                return;
+            }
+
+            mCareSettings.setMeasureHR(careMeasureHR);
             demoSetSettingToDevice();
         }
         else {
-            showToast("Error Format (invalid input : must be `0` or `1`)");
+            showToast("Error Format (invalid parameter counts)");
         }
     }
 
@@ -1142,7 +1314,7 @@ public class MainActivity extends PreferenceActivity implements Preference.OnPre
     void demoSettingDND(String userInput) {
         if (userInput.equals("0") || userInput.equals("1")) {
             // Demo - DND setting
-            CareDoNotDisturb setting = mCareSettings.getDoNotDisturb();
+            CareDoNotDisturb setting = mCareSettings.getDefaultDoNotDisturb();
             boolean enable = userInput.equals("1") ? true : false;
             setting.setEnableDoNotDisturb(enable);
             setting.setRepeatDays(convertRepeatDay(127));
@@ -1171,6 +1343,46 @@ public class MainActivity extends PreferenceActivity implements Preference.OnPre
         }
         else {
             showToast("Error Format (invalid input : must be `0` or `1`)");
+        }
+    }
+
+    void demoSettingHRWarning(String userInput) {
+        String[] separated = userInput.split(",");
+        if (separated.length == 3) {
+            // Demo - HR warning setting
+            CareHRWarning careHRWarning = mCareSettings.getDefaultHRWarning();
+            if (separated[0].equals("on") || separated[0].equals("off")) {
+                boolean enable = separated[0].equals("on") ? true : false;
+                careHRWarning.setEnableHRWarning(enable);
+            }
+            else {
+                showToast("Error Format (invalid input : must be `on` or `off`)");
+                return;
+            }
+
+            try {
+                int maxWarning = Integer.valueOf(separated[1]).intValue();
+                careHRWarning.setMaxHRLimit(maxWarning);
+            }
+            catch (NumberFormatException e) {
+                showToast("Error Format (not number format)");
+                return;
+            }
+
+            try {
+                int minWarning = Integer.valueOf(separated[2]).intValue();
+                careHRWarning.setMinHRLimit(minWarning);
+            }
+            catch (NumberFormatException e) {
+                showToast("Error Format (not number format)");
+                return;
+            }
+
+            mCareSettings.setHRWarning(careHRWarning);
+            demoSetSettingToDevice();
+        }
+        else {
+            showToast("Error Format (invalid parameter counts)");
         }
     }
 
@@ -1204,4 +1416,33 @@ public class MainActivity extends PreferenceActivity implements Preference.OnPre
             return 0;
         }
     }
+
+    void demoSetRemoteCameraHandler() {
+        _goFITSdk.setRemoteCameraHandler(new AppContract.RemoteCameraHandler() {
+            @Override
+            public void triggerCamera() {
+
+                Log.e("[RemoteCamera]", "Trigger Remote Camera!");
+
+                if (CameraClass.cameraGetCurrent() != null) {
+                    CameraClass.cameraTakePicture(mCameraShutterCallback, CameraClass.mCameraPictureCallback);
+                } else {
+                    startActivity(new Intent(getApplicationContext(), RemoteCamera.class));
+                }
+
+            }
+        });
+    }
+
+    @SuppressWarnings("deprecation")
+    private Camera.ShutterCallback mCameraShutterCallback = new Camera.ShutterCallback() {
+        @Override
+        public void onShutter() {
+            AudioManager mgr = (AudioManager) getApplicationContext().getSystemService(Context.AUDIO_SERVICE);
+            mgr.playSoundEffect(AudioManager.FLAG_PLAY_SOUND, 100);
+
+            Vibrator myVibrator = (Vibrator) getApplicationContext().getSystemService(Service.VIBRATOR_SERVICE);
+            myVibrator.vibrate(300);
+        }
+    };
 }
