@@ -33,11 +33,17 @@
             android:key="demo_function_init"
             android:title="7. Device Data Initialization" />
         <Preference
+            android:key="demo_function_find_my_care"
+            android:title="8. Find My Care" />
+        <Preference
             android:key="demo_function_dfu"
-            android:title="8. Device Firmware Update" />
+            android:title="9. Device Firmware Update" />
         <Preference
             android:key="demo_function_disconnect"
-            android:title="9. Device Disconnect" />
+            android:title="10. Device Disconnect" />
+        <Preference
+            android:key="demo_function_set_connect_timeout"
+            android:title="11. Set Connect Timeout" />
     </PreferenceCategory>
 
     <PreferenceCategory android:title="DEVICE STATUS" >

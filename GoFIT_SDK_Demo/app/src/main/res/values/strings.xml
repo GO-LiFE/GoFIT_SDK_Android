@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">GoFIT_SDK_Demo</string>
+    <string name="action_settings">Settings</string>
 </resources>
